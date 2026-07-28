@@ -3,7 +3,9 @@ import {
   ACCESO_COMPLETO,
   CLINICAS,
   PISO_MENSUAL,
+  PISO_SETUP,
   TOPE_MENSUAL,
+  TOPE_SETUP,
   type Clinica,
   type PlanId,
 } from './data/clinicas'
@@ -36,11 +38,19 @@ export default function App() {
   )
   const [piso, setPiso] = useState(PISO_MENSUAL)
   const [tope, setTope] = useState(TOPE_MENSUAL)
+  const [pisoSetup, setPisoSetup] = useState(PISO_SETUP)
+  const [topeSetup, setTopeSetup] = useState(TOPE_SETUP)
   const [filtro, setFiltro] = useState<Filtro>('todas')
   const [seleccionada, setSeleccionada] = useState<string | null>('sarmiento')
   const [busqueda, setBusqueda] = useState('')
 
-  const params = useMemo(() => ({ piso, tope }), [piso, tope])
+  const params = useMemo(
+    () => ({
+      mensual: { piso, tope },
+      setup: { piso: pisoSetup, tope: topeSetup },
+    }),
+    [piso, tope, pisoSetup, topeSetup],
+  )
   const cotizaciones = useMemo(
     () => cotizarTodas(params, clinicas),
     [params, clinicas],
@@ -73,12 +83,14 @@ export default function App() {
       business: 0,
       enterprise: 0,
     }
-    let total = 0
+    let totalMensual = 0
+    let totalSetup = 0
     for (const d of cotizaciones) {
       counts[d.plan.id]++
-      total += d.cotizacionMensual
+      totalMensual += d.cotizacionMensual
+      totalSetup += d.setupInicial
     }
-    return { counts, total }
+    return { counts, totalMensual, totalSetup }
   }, [cotizaciones])
 
   function onChangeCama(id: string, campo: CampoCama, raw: string) {
@@ -104,10 +116,10 @@ export default function App() {
             <h1>Cotizador de suscripción</h1>
           </div>
         </div>
-        <div className="params">
+        <div className="params params-wide">
           <label>
             Piso mensual
-            <span className="hint">Mínimo por prestador</span>
+            <span className="hint">Suscripción mínima</span>
             <div className="input-money">
               <span>$</span>
               <input
@@ -120,7 +132,7 @@ export default function App() {
             </div>
           </label>
           <label>
-            Tope Escala
+            Tope mensual
             <span className="hint">Ancla Sanatorio Chaco</span>
             <div className="input-money">
               <span>$</span>
@@ -133,18 +145,45 @@ export default function App() {
               />
             </div>
           </label>
+          <label>
+            Piso setup
+            <span className="hint">Setup inicial mínimo</span>
+            <div className="input-money">
+              <span>$</span>
+              <input
+                type="number"
+                min={0}
+                step={100000}
+                value={pisoSetup}
+                onChange={(e) => setPisoSetup(Number(e.target.value) || 0)}
+              />
+            </div>
+          </label>
+          <label>
+            Tope setup
+            <span className="hint">Setup inicial máximo</span>
+            <div className="input-money">
+              <span>$</span>
+              <input
+                type="number"
+                min={0}
+                step={100000}
+                value={topeSetup}
+                onChange={(e) => setTopeSetup(Number(e.target.value) || 0)}
+              />
+            </div>
+          </label>
         </div>
       </header>
 
       <p className="product-note">
-        Misma plataforma para todos: sin límites de usuarios ni sedes. Las bandas solo
-        empaquetan el precio según tamaño (camas). Editá las camas abajo y todo se
-        recalcula al instante.
+        Misma plataforma para todos. Mensual y setup inicial escalan por tamaño (camas).
+        Editá camas o parámetros y todo se recalcula al instante.
       </p>
 
       <section className="plans" aria-label="Bandas de tamaño">
         {PLANES_SAAS.map((plan) => {
-          const banda = bandaDePlan(plan.id, params)
+          const banda = bandaDePlan(plan.id, params.mensual)
           const count = resumen.counts[plan.id]
           const active = filtro === plan.id
           return (
@@ -161,7 +200,7 @@ export default function App() {
               <p className="plan-tagline">{plan.tagline}</p>
               <p className="plan-price">
                 {formatARS(banda.min)}
-                <span> — {formatARS(banda.max)}</span>
+                <span> — {formatARS(banda.max)} / mes</span>
               </p>
               <p className="plan-same">Producto completo</p>
             </button>
@@ -169,20 +208,26 @@ export default function App() {
         })}
       </section>
 
-      <section className="stats" aria-label="Resumen">
+      <section className="stats stats-4" aria-label="Resumen">
         <article className="stat">
           <span className="stat-label">Prestadores</span>
           <strong>{cotizaciones.length}</strong>
         </article>
         <article className="stat">
-          <span className="stat-label">Ticket promedio</span>
+          <span className="stat-label">Ticket mensual avg</span>
           <strong>
-            {formatARS(Math.round(resumen.total / Math.max(1, cotizaciones.length)))}
+            {formatARS(
+              Math.round(resumen.totalMensual / Math.max(1, cotizaciones.length)),
+            )}
           </strong>
         </article>
+        <article className="stat">
+          <span className="stat-label">Setup cartera</span>
+          <strong>{formatARS(resumen.totalSetup)}</strong>
+        </article>
         <article className="stat stat-total">
-          <span className="stat-label">MRR estimado cartera</span>
-          <strong>{formatARS(resumen.total)}</strong>
+          <span className="stat-label">MRR estimado</span>
+          <strong>{formatARS(resumen.totalMensual)}</strong>
         </article>
       </section>
 
@@ -245,7 +290,10 @@ export default function App() {
                     <span>
                       {d.clinica.totalCamas} camas · {LABEL_COMPLEJIDAD[d.complejidad]}
                     </span>
-                    <strong>{formatARS(d.cotizacionMensual)}</strong>
+                    <div className="clinica-amounts">
+                      <strong>{formatARS(d.cotizacionMensual)}/mes</strong>
+                      <span>Setup {formatARS(d.setupInicial)}</span>
+                    </div>
                   </div>
                 </button>
               </li>
@@ -272,13 +320,23 @@ export default function App() {
                 <p className="localidad-line">{detalle.clinica.localidad}</p>
                 <p className="motivo">{detalle.motivoComplejidad}</p>
               </div>
-              <div className="quote-hero">
-                <span>Suscripción mensual</span>
-                <strong>{formatARS(detalle.cotizacionMensual)}</strong>
-                <small>
-                  {detalle.clinica.totalCamas} camas · índice tamaño{' '}
-                  {detalle.indiceTamano.toFixed(1)}
-                </small>
+              <div className="quote-pair">
+                <div className="quote-hero">
+                  <span>Suscripción mensual</span>
+                  <strong>{formatARS(detalle.cotizacionMensual)}</strong>
+                  <small>
+                    {detalle.clinica.totalCamas} camas · índice{' '}
+                    {detalle.indiceTamano.toFixed(1)}
+                  </small>
+                </div>
+                <div className="quote-hero quote-setup">
+                  <span>Setup inicial</span>
+                  <strong>{formatARS(detalle.setupInicial)}</strong>
+                  <small>
+                    Rango {formatARS(detalle.bandaSetup.min)} –{' '}
+                    {formatARS(detalle.bandaSetup.max)}
+                  </small>
+                </div>
               </div>
             </header>
 
@@ -305,10 +363,9 @@ export default function App() {
                   Índice de tamaño: <strong>{detalle.indiceTamano.toFixed(1)}</strong>
                 </p>
                 <p className="calc-note">
-                  El precio sigue el tamaño del prestador (camas), con un plus suave por
-                  UTI/UCO/Neo/UCI. Escala continua: piso {formatARS(piso)} → ancla Sarmiento →
-                  tope {formatARS(tope)} (Chaco). La complejidad es informativa; no limita
-                  módulos ni uso.
+                  Mensual y setup usan la misma curva por tamaño: piso → ancla Sarmiento →
+                  tope Chaco. Mensual {formatARS(piso)}–{formatARS(tope)}. Setup{' '}
+                  {formatARS(pisoSetup)}–{formatARS(topeSetup)}.
                 </p>
                 <h3 className="subhead">Servicios clínicos</h3>
                 <ul className="servicios dense">
@@ -327,7 +384,7 @@ export default function App() {
           <div>
             <h2>Prestadores · camas editables</h2>
             <p>
-              Cambiá cualquier valor: cotización, banda, complejidad, MRR y detalle se
+              Cambiá cualquier valor: mensual, setup, banda, complejidad y totales se
               actualizan en vivo.
             </p>
           </div>
@@ -349,6 +406,7 @@ export default function App() {
                 <th>Banda</th>
                 <th>Complejidad</th>
                 <th>Mensual</th>
+                <th>Setup</th>
               </tr>
             </thead>
             <tbody>
@@ -400,6 +458,9 @@ export default function App() {
                     </td>
                     <td className="col-precio">
                       {d ? formatARS(d.cotizacionMensual) : '—'}
+                    </td>
+                    <td className="col-precio col-setup">
+                      {d ? formatARS(d.setupInicial) : '—'}
                     </td>
                   </tr>
                 )

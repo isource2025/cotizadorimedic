@@ -129,6 +129,11 @@ input {
   box-shadow: var(--shadow);
 }
 
+.params-wide {
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  min-width: min(100%, 520px);
+}
+
 .params label {
   display: flex;
   flex-direction: column;
@@ -274,6 +279,10 @@ input {
   margin-bottom: 20px;
   animation: rise 0.65s ease both;
   animation-delay: 0.05s;
+}
+
+.stats-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .stat {
@@ -495,6 +504,56 @@ input {
   color: var(--ink);
 }
 
+.clinica-amounts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.clinica-amounts span {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  font-weight: 650;
+}
+
+.quote-pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.quote-hero {
+  min-width: min(100%, 200px);
+  flex: 1;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: linear-gradient(160deg, #0a524c, #12756c 60%, #1d8f84);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 16px 30px rgba(10, 82, 76, 0.28);
+}
+
+.quote-setup {
+  background: linear-gradient(160deg, #5b3d12, #8a6a2f 55%, #b8893a);
+  box-shadow: 0 16px 30px rgba(91, 61, 18, 0.22);
+}
+
+.quote-hero span,
+.quote-hero small {
+  opacity: 0.82;
+  font-size: 0.8rem;
+}
+
+.quote-hero strong {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
 .empty {
   padding: 28px 16px;
   text-align: center;
@@ -585,31 +644,6 @@ input {
   max-width: 42ch;
   color: var(--ink-soft);
   line-height: 1.45;
-}
-
-.quote-hero {
-  min-width: min(100%, 240px);
-  padding: 16px 18px;
-  border-radius: 16px;
-  background: linear-gradient(160deg, #0a524c, #12756c 60%, #1d8f84);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  box-shadow: 0 16px 30px rgba(10, 82, 76, 0.28);
-}
-
-.quote-hero span,
-.quote-hero small {
-  opacity: 0.82;
-  font-size: 0.8rem;
-}
-
-.quote-hero strong {
-  font-family: var(--font-display);
-  font-size: 1.85rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
 }
 
 .beds-grid {
@@ -775,6 +809,9 @@ input {
 
 @media (max-width: 1100px) {
   .plans {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stats-4 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -957,4 +994,8 @@ input {
   font-weight: 800;
   white-space: nowrap;
   color: var(--teal-deep);
+}
+
+.col-setup {
+  color: #5b3d12;
 }

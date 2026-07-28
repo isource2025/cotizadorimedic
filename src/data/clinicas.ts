@@ -349,6 +349,12 @@ export const PISO_MENSUAL = 300_000
 /** Tope — Sanatorio Chaco */
 export const TOPE_MENSUAL = 1_000_000
 
+/** Piso setup inicial */
+export const PISO_SETUP = 2_000_000
+
+/** Tope setup inicial */
+export const TOPE_SETUP = 6_000_000
+
 /**
  * Índice de tamaño: las camas totales mandan.
  * Las críticas suman un plus suave (no distorsionan 40 vs 44 camas).

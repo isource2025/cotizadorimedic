@@ -5,8 +5,10 @@ import {
   PESOS_CAMAS,
   PESOS_TAMANO,
   PISO_MENSUAL,
+  PISO_SETUP,
   PLANES_SAAS,
   TOPE_MENSUAL,
+  TOPE_SETUP,
   type Clinica,
   type Complejidad,
   type PlanId,
@@ -26,6 +28,11 @@ export interface ParametrosPrecio {
   tope: number
 }
 
+export interface ParametrosCotizacion {
+  mensual: ParametrosPrecio
+  setup: ParametrosPrecio
+}
+
 export interface DetalleCotizacion {
   clinica: Clinica
   indiceTamano: number
@@ -34,7 +41,9 @@ export interface DetalleCotizacion {
   plan: PlanSaas
   fraccionPrecio: number
   cotizacionMensual: number
+  setupInicial: number
   bandaPlan: { min: number; max: number }
+  bandaSetup: { min: number; max: number }
   servicios: string[]
 }
 
@@ -128,9 +137,8 @@ function clamp01(n: number): number {
 }
 
 /**
- * Precio continuo por tamaño:
+ * Precio continuo por tamaño (mensual o setup):
  * piso ←→ ancla Sarmiento ←→ tope Chaco
- * (anclas leídas del catálogo editable)
  */
 export function precioPorTamano(
   clinica: Clinica,
@@ -149,7 +157,6 @@ export function precioPorTamano(
   const tamMax = calcularTamano(anclaTope)
   const tamMin = Math.min(...catalogo.map(calcularTamano))
 
-  // Chaco define el techo: igual o más grande → tope
   if (clinica.esTope || tamano >= tamMax) {
     return { precio: tope, fraccion: 1, tamano }
   }
@@ -195,30 +202,41 @@ export function bandaDePlan(
   }
 }
 
+export const DEFAULT_PARAMS: ParametrosCotizacion = {
+  mensual: { piso: PISO_MENSUAL, tope: TOPE_MENSUAL },
+  setup: { piso: PISO_SETUP, tope: TOPE_SETUP },
+}
+
 export function cotizarClinica(
   clinica: Clinica,
-  params: ParametrosPrecio = { piso: PISO_MENSUAL, tope: TOPE_MENSUAL },
+  params: ParametrosCotizacion = DEFAULT_PARAMS,
   catalogo: Clinica[] = CLINICAS,
 ): DetalleCotizacion {
   const { complejidad, motivo } = clasificarComplejidad(clinica)
-  const { precio, fraccion, tamano } = precioPorTamano(clinica, params, catalogo)
-  const plan = planPorFraccion(fraccion)
+  const mensual = precioPorTamano(clinica, params.mensual, catalogo)
+  const setup = precioPorTamano(clinica, params.setup, catalogo)
+  const plan = planPorFraccion(mensual.fraccion)
 
   return {
     clinica,
-    indiceTamano: tamano,
+    indiceTamano: mensual.tamano,
     complejidad,
     motivoComplejidad: motivo,
     plan,
-    fraccionPrecio: fraccion,
-    cotizacionMensual: precio,
-    bandaPlan: bandaDePlan(plan.id, params),
+    fraccionPrecio: mensual.fraccion,
+    cotizacionMensual: mensual.precio,
+    setupInicial: setup.precio,
+    bandaPlan: bandaDePlan(plan.id, params.mensual),
+    bandaSetup: {
+      min: params.setup.piso,
+      max: params.setup.tope,
+    },
     servicios: listarServicios(clinica),
   }
 }
 
 export function cotizarTodas(
-  params: ParametrosPrecio = { piso: PISO_MENSUAL, tope: TOPE_MENSUAL },
+  params: ParametrosCotizacion = DEFAULT_PARAMS,
   catalogo: Clinica[] = CLINICAS,
 ): DetalleCotizacion[] {
   return catalogo
