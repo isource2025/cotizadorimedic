@@ -1,6 +1,14 @@
 import { useMemo, useState } from 'react'
-import { ACCESO_COMPLETO, PISO_MENSUAL, TOPE_MENSUAL, type PlanId } from './data/clinicas'
 import {
+  ACCESO_COMPLETO,
+  CLINICAS,
+  PISO_MENSUAL,
+  TOPE_MENSUAL,
+  type Clinica,
+  type PlanId,
+} from './data/clinicas'
+import {
+  actualizarCamas,
   cotizarTodas,
   formatARS,
   LABEL_COMPLEJIDAD,
@@ -8,13 +16,24 @@ import {
   PESOS_CAMAS,
   PLANES_SAAS,
   bandaDePlan,
+  type CampoCama,
   type DetalleCotizacion,
 } from './lib/cotizacion'
 import './App.css'
 
 type Filtro = 'todas' | PlanId
 
+const CAMPOS_CAMA: { key: CampoCama; label: string }[] = [
+  { key: 'camasGenerales', label: 'Generales' },
+  { key: 'camasUtiUco', label: 'UTI/UCO' },
+  { key: 'camasUtiNeoPed', label: 'Neo/Ped' },
+  { key: 'camasUci', label: 'UCI' },
+]
+
 export default function App() {
+  const [clinicas, setClinicas] = useState<Clinica[]>(() =>
+    CLINICAS.map((c) => ({ ...c })),
+  )
   const [piso, setPiso] = useState(PISO_MENSUAL)
   const [tope, setTope] = useState(TOPE_MENSUAL)
   const [filtro, setFiltro] = useState<Filtro>('todas')
@@ -22,7 +41,15 @@ export default function App() {
   const [busqueda, setBusqueda] = useState('')
 
   const params = useMemo(() => ({ piso, tope }), [piso, tope])
-  const cotizaciones = useMemo(() => cotizarTodas(params), [params])
+  const cotizaciones = useMemo(
+    () => cotizarTodas(params, clinicas),
+    [params, clinicas],
+  )
+  const cotizacionPorId = useMemo(() => {
+    const map = new Map<string, DetalleCotizacion>()
+    for (const d of cotizaciones) map.set(d.clinica.id, d)
+    return map
+  }, [cotizaciones])
 
   const filtradas = useMemo(() => {
     const q = busqueda.trim().toLowerCase()
@@ -53,6 +80,17 @@ export default function App() {
     }
     return { counts, total }
   }, [cotizaciones])
+
+  function onChangeCama(id: string, campo: CampoCama, raw: string) {
+    const valor = raw === '' ? 0 : Number(raw)
+    setClinicas((prev) =>
+      prev.map((c) => (c.id === id ? actualizarCamas(c, campo, valor) : c)),
+    )
+  }
+
+  function resetCatalogo() {
+    setClinicas(CLINICAS.map((c) => ({ ...c })))
+  }
 
   return (
     <div className="app">
@@ -100,7 +138,8 @@ export default function App() {
 
       <p className="product-note">
         Misma plataforma para todos: sin límites de usuarios ni sedes. Las bandas solo
-        empaquetan el precio según tamaño (camas).
+        empaquetan el precio según tamaño (camas). Editá las camas abajo y todo se
+        recalcula al instante.
       </p>
 
       <section className="plans" aria-label="Bandas de tamaño">
@@ -282,6 +321,93 @@ export default function App() {
           </main>
         )}
       </div>
+
+      <section className="panel editor-panel" aria-label="Editor de camas">
+        <div className="editor-head">
+          <div>
+            <h2>Prestadores · camas editables</h2>
+            <p>
+              Cambiá cualquier valor: cotización, banda, complejidad, MRR y detalle se
+              actualizan en vivo.
+            </p>
+          </div>
+          <button type="button" className="btn-reset" onClick={resetCatalogo}>
+            Restaurar datos originales
+          </button>
+        </div>
+
+        <div className="editor-scroll">
+          <table className="editor-table">
+            <thead>
+              <tr>
+                <th>Prestador</th>
+                <th>Localidad</th>
+                {CAMPOS_CAMA.map((c) => (
+                  <th key={c.key}>{c.label}</th>
+                ))}
+                <th>Total</th>
+                <th>Banda</th>
+                <th>Complejidad</th>
+                <th>Mensual</th>
+              </tr>
+            </thead>
+            <tbody>
+              {clinicas.map((c) => {
+                const d = cotizacionPorId.get(c.id)
+                return (
+                  <tr
+                    key={c.id}
+                    className={seleccionada === c.id ? 'row-selected' : undefined}
+                    onClick={() => setSeleccionada(c.id)}
+                  >
+                    <td className="col-nombre">
+                      <strong>{c.nombre}</strong>
+                      {c.esReferenciaMedia ? <em>Ancla</em> : null}
+                      {c.esTope ? <em>Tope</em> : null}
+                    </td>
+                    <td>{c.localidad}</td>
+                    {CAMPOS_CAMA.map((campo) => (
+                      <td key={campo.key} className="col-input">
+                        <input
+                          type="number"
+                          min={0}
+                          step={1}
+                          value={c[campo.key]}
+                          aria-label={`${c.nombre} ${campo.label}`}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) => onChangeCama(c.id, campo.key, e.target.value)}
+                        />
+                      </td>
+                    ))}
+                    <td className="col-total">{c.totalCamas}</td>
+                    <td>
+                      {d ? (
+                        <span className={`badge badge-plan badge-${d.plan.id}`}>
+                          {LABEL_PLAN[d.plan.id]}
+                        </span>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
+                    <td>
+                      {d ? (
+                        <span className={`badge badge-${d.complejidad}`}>
+                          {LABEL_COMPLEJIDAD[d.complejidad]}
+                        </span>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
+                    <td className="col-precio">
+                      {d ? formatARS(d.cotizacionMensual) : '—'}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   )
 }

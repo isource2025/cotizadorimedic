@@ -15,6 +15,12 @@ import {
 
 export { ACCESO_COMPLETO, PESOS_CAMAS, PLANES_SAAS }
 
+export type CampoCama =
+  | 'camasGenerales'
+  | 'camasUtiUco'
+  | 'camasUtiNeoPed'
+  | 'camasUci'
+
 export interface ParametrosPrecio {
   piso: number
   tope: number
@@ -40,6 +46,22 @@ export function calcularTamano(c: Clinica): number {
     c.camasUtiNeoPed * PESOS_TAMANO.utiNeoPed +
     c.camasUci * PESOS_TAMANO.uci
   )
+}
+
+export function totalDesdeTipos(c: Pick<Clinica, CampoCama>): number {
+  return c.camasGenerales + c.camasUtiUco + c.camasUtiNeoPed + c.camasUci
+}
+
+export function actualizarCamas(
+  clinica: Clinica,
+  campo: CampoCama,
+  valor: number,
+): Clinica {
+  const next = {
+    ...clinica,
+    [campo]: Math.max(0, Number.isFinite(valor) ? Math.floor(valor) : 0),
+  }
+  return { ...next, totalCamas: totalDesdeTipos(next) }
 }
 
 export function listarServicios(c: Clinica): string[] {
@@ -108,10 +130,12 @@ function clamp01(n: number): number {
 /**
  * Precio continuo por tamaño:
  * piso ←→ ancla Sarmiento ←→ tope Chaco
+ * (anclas leídas del catálogo editable)
  */
 export function precioPorTamano(
   clinica: Clinica,
   params: ParametrosPrecio = { piso: PISO_MENSUAL, tope: TOPE_MENSUAL },
+  catalogo: Clinica[] = CLINICAS,
 ): { precio: number; fraccion: number; tamano: number } {
   const piso = Math.max(0, params.piso)
   const tope = Math.max(piso, params.tope)
@@ -119,11 +143,11 @@ export function precioPorTamano(
   const precioRef = piso + FRACCION_ANCLA_MEDIA * rango
 
   const tamano = calcularTamano(clinica)
-  const ref = CLINICAS.find((c) => c.esReferenciaMedia)!
-  const anclaTope = CLINICAS.find((c) => c.esTope)!
+  const ref = catalogo.find((c) => c.esReferenciaMedia) ?? catalogo[0]
+  const anclaTope = catalogo.find((c) => c.esTope) ?? catalogo[catalogo.length - 1]
   const tamRef = calcularTamano(ref)
   const tamMax = calcularTamano(anclaTope)
-  const tamMin = Math.min(...CLINICAS.map(calcularTamano))
+  const tamMin = Math.min(...catalogo.map(calcularTamano))
 
   // Chaco define el techo: igual o más grande → tope
   if (clinica.esTope || tamano >= tamMax) {
@@ -174,9 +198,10 @@ export function bandaDePlan(
 export function cotizarClinica(
   clinica: Clinica,
   params: ParametrosPrecio = { piso: PISO_MENSUAL, tope: TOPE_MENSUAL },
+  catalogo: Clinica[] = CLINICAS,
 ): DetalleCotizacion {
   const { complejidad, motivo } = clasificarComplejidad(clinica)
-  const { precio, fraccion, tamano } = precioPorTamano(clinica, params)
+  const { precio, fraccion, tamano } = precioPorTamano(clinica, params, catalogo)
   const plan = planPorFraccion(fraccion)
 
   return {
@@ -194,10 +219,11 @@ export function cotizarClinica(
 
 export function cotizarTodas(
   params: ParametrosPrecio = { piso: PISO_MENSUAL, tope: TOPE_MENSUAL },
+  catalogo: Clinica[] = CLINICAS,
 ): DetalleCotizacion[] {
-  return CLINICAS.map((c) => cotizarClinica(c, params)).sort(
-    (a, b) => b.cotizacionMensual - a.cotizacionMensual,
-  )
+  return catalogo
+    .map((c) => cotizarClinica(c, params, catalogo))
+    .sort((a, b) => b.cotizacionMensual - a.cotizacionMensual)
 }
 
 export function formatARS(valor: number): string {

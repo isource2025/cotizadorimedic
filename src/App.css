@@ -810,3 +810,151 @@ input {
     grid-template-columns: 1fr;
   }
 }
+
+.editor-panel {
+  position: relative;
+  z-index: 1;
+  margin-top: 20px;
+  padding: 20px;
+  animation: rise 0.75s ease both;
+}
+
+.editor-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+
+.editor-head h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 600;
+}
+
+.editor-head p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  max-width: 52ch;
+  line-height: 1.4;
+}
+
+.btn-reset {
+  border: 1px solid var(--line);
+  background: white;
+  color: var(--teal-deep);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-reset:hover {
+  background: var(--teal-soft);
+  border-color: rgba(13, 107, 99, 0.3);
+}
+
+.editor-scroll {
+  overflow: auto;
+  max-height: min(70vh, 720px);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fbfdfc;
+}
+
+.editor-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+  font-size: 0.88rem;
+}
+
+.editor-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #eef5f2;
+  text-align: left;
+  padding: 12px 10px;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--teal-deep);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.editor-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(21, 32, 40, 0.06);
+  vertical-align: middle;
+}
+
+.editor-table tbody tr {
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.editor-table tbody tr:hover {
+  background: rgba(13, 107, 99, 0.04);
+}
+
+.editor-table tbody tr.row-selected {
+  background: var(--teal-soft);
+}
+
+.col-nombre {
+  min-width: 220px;
+}
+
+.col-nombre strong {
+  display: inline;
+  font-weight: 750;
+}
+
+.col-nombre em {
+  margin-left: 6px;
+  font-style: normal;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--teal);
+  background: white;
+  border-radius: 999px;
+  padding: 2px 6px;
+  border: 1px solid rgba(13, 107, 99, 0.2);
+}
+
+.col-input input {
+  width: 72px;
+  padding: 8px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: white;
+  font-weight: 700;
+  text-align: right;
+  outline: none;
+}
+
+.col-input input:focus {
+  border-color: rgba(13, 107, 99, 0.45);
+  box-shadow: 0 0 0 3px rgba(13, 107, 99, 0.12);
+}
+
+.col-total {
+  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.col-precio {
+  font-weight: 800;
+  white-space: nowrap;
+  color: var(--teal-deep);
+}
