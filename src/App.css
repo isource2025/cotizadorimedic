@@ -456,6 +456,19 @@ input {
   line-height: 1.25;
 }
 
+.clinica-localidad {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.localidad-line {
+  margin: 0 0 8px;
+  color: var(--teal-deep);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
 .clinica-name em {
   margin-left: 8px;
   font-style: normal;

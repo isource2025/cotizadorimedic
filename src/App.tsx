@@ -28,7 +28,10 @@ export default function App() {
     const q = busqueda.trim().toLowerCase()
     return cotizaciones.filter((d) => {
       const okFiltro = filtro === 'todas' || d.plan.id === filtro
-      const okBusqueda = !q || d.clinica.nombre.toLowerCase().includes(q)
+      const okBusqueda =
+        !q ||
+        d.clinica.nombre.toLowerCase().includes(q) ||
+        d.clinica.localidad.toLowerCase().includes(q)
       return okFiltro && okBusqueda
     })
   }, [cotizaciones, filtro, busqueda])
@@ -150,7 +153,7 @@ export default function App() {
             <input
               className="search"
               type="search"
-              placeholder="Buscar establecimiento…"
+              placeholder="Buscar establecimiento o localidad…"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               aria-label="Buscar establecimiento"
@@ -197,6 +200,7 @@ export default function App() {
                       {d.clinica.esReferenciaMedia ? <em>Ancla</em> : null}
                       {d.clinica.esTope ? <em>Tope</em> : null}
                     </span>
+                    <span className="clinica-localidad">{d.clinica.localidad}</span>
                   </div>
                   <div className="clinica-row-meta">
                     <span>
@@ -226,6 +230,7 @@ export default function App() {
                   </span>
                 </div>
                 <h2>{detalle.clinica.nombre}</h2>
+                <p className="localidad-line">{detalle.clinica.localidad}</p>
                 <p className="motivo">{detalle.motivoComplejidad}</p>
               </div>
               <div className="quote-hero">

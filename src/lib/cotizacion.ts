@@ -120,12 +120,13 @@ export function precioPorTamano(
 
   const tamano = calcularTamano(clinica)
   const ref = CLINICAS.find((c) => c.esReferenciaMedia)!
-  const max = CLINICAS.find((c) => c.esTope)!
+  const anclaTope = CLINICAS.find((c) => c.esTope)!
   const tamRef = calcularTamano(ref)
-  const tamMax = calcularTamano(max)
+  const tamMax = calcularTamano(anclaTope)
   const tamMin = Math.min(...CLINICAS.map(calcularTamano))
 
-  if (clinica.esTope) {
+  // Chaco define el techo: igual o más grande → tope
+  if (clinica.esTope || tamano >= tamMax) {
     return { precio: tope, fraccion: 1, tamano }
   }
   if (clinica.esReferenciaMedia) {

@@ -4,6 +4,7 @@ export type PlanId = 'starter' | 'professional' | 'business' | 'enterprise'
 export interface Clinica {
   id: string
   nombre: string
+  localidad: string
   camasGenerales: number
   camasUtiUco: number
   camasUtiNeoPed: number
@@ -15,11 +16,13 @@ export interface Clinica {
   esTope?: boolean
 }
 
-/** Prestadores miembros — Asociación de Clínicas y Sanatorios del Chaco */
+/** Prestadores — Asociación de Clínicas y Sanatorios del Chaco */
 export const CLINICAS: Clinica[] = [
+  // —— Resistencia / miembros ——
   {
     id: 'sanatorio-chaco',
     nombre: 'Sanatorio Chaco',
+    localidad: 'Resistencia',
     camasGenerales: 46,
     camasUtiUco: 17,
     camasUtiNeoPed: 25,
@@ -30,6 +33,7 @@ export const CLINICAS: Clinica[] = [
   {
     id: 'frangioli',
     nombre: 'Sanatorio Frangioli de Salud 2000',
+    localidad: 'Resistencia',
     camasGenerales: 34,
     camasUtiUco: 9,
     camasUtiNeoPed: 0,
@@ -39,6 +43,7 @@ export const CLINICAS: Clinica[] = [
   {
     id: 'cordis',
     nombre: 'Instituto Cordis-Cuore y Hemodinamia',
+    localidad: 'Resistencia',
     camasGenerales: 6,
     camasUtiUco: 18,
     camasUtiNeoPed: 0,
@@ -48,6 +53,7 @@ export const CLINICAS: Clinica[] = [
   {
     id: 'tesa',
     nombre: 'Instituto Oftalmológico Tesa',
+    localidad: 'Resistencia',
     camasGenerales: 2,
     camasUtiUco: 0,
     camasUtiNeoPed: 0,
@@ -57,6 +63,7 @@ export const CLINICAS: Clinica[] = [
   {
     id: 'materno-infantil',
     nombre: 'Sanatorio Materno Infantil',
+    localidad: 'Resistencia',
     camasGenerales: 52,
     camasUtiUco: 8,
     camasUtiNeoPed: 14,
@@ -66,6 +73,7 @@ export const CLINICAS: Clinica[] = [
   {
     id: 'ojos-oidos',
     nombre: 'Instituto de Ojos y Oídos',
+    localidad: 'Resistencia',
     camasGenerales: 11,
     camasUtiUco: 0,
     camasUtiNeoPed: 0,
@@ -75,6 +83,7 @@ export const CLINICAS: Clinica[] = [
   {
     id: 'sarmiento',
     nombre: 'Sanatorio Sarmiento',
+    localidad: 'Resistencia',
     camasGenerales: 30,
     camasUtiUco: 11,
     camasUtiNeoPed: 0,
@@ -85,6 +94,7 @@ export const CLINICAS: Clinica[] = [
   {
     id: 'chaco-oeste',
     nombre: 'Sanatorio Chaco Oeste',
+    localidad: 'Resistencia',
     camasGenerales: 28,
     camasUtiUco: 9,
     camasUtiNeoPed: 1,
@@ -94,6 +104,7 @@ export const CLINICAS: Clinica[] = [
   {
     id: 'salud-mental',
     nombre: 'Espacio Integral de Salud Mental',
+    localidad: 'Resistencia',
     camasGenerales: 40,
     camasUtiUco: 0,
     camasUtiNeoPed: 0,
@@ -103,6 +114,7 @@ export const CLINICAS: Clinica[] = [
   {
     id: 'center',
     nombre: 'Instituto Center',
+    localidad: 'Resistencia',
     camasGenerales: 6,
     camasUtiUco: 0,
     camasUtiNeoPed: 0,
@@ -112,6 +124,7 @@ export const CLINICAS: Clinica[] = [
   {
     id: 'renales',
     nombre: 'Centro de Enfermedades Renales',
+    localidad: 'Resistencia',
     camasGenerales: 0,
     camasUtiUco: 0,
     camasUtiNeoPed: 0,
@@ -121,11 +134,212 @@ export const CLINICAS: Clinica[] = [
   {
     id: 'sol',
     nombre: 'Instituto Sol',
+    localidad: 'Resistencia',
     camasGenerales: 2,
     camasUtiUco: 0,
     camasUtiNeoPed: 0,
     camasUci: 0,
     totalCamas: 2,
+  },
+
+  // —— Barranqueras ——
+  {
+    id: 'clinica-barranqueras',
+    nombre: 'Clínica Barranqueras',
+    localidad: 'Barranqueras',
+    camasGenerales: 12,
+    camasUtiUco: 5,
+    camasUtiNeoPed: 0,
+    camasUci: 2,
+    totalCamas: 19,
+  },
+
+  // —— La Leonesa ——
+  {
+    id: 'clinica-sallud',
+    nombre: 'Clínica Sallud',
+    localidad: 'La Leonesa',
+    camasGenerales: 16,
+    camasUtiUco: 0,
+    camasUtiNeoPed: 1,
+    camasUci: 0,
+    totalCamas: 17,
+  },
+
+  // —— Machagai ——
+  {
+    id: 'clinica-santa-rita',
+    nombre: 'Clínica Santa Rita',
+    localidad: 'Machagai',
+    camasGenerales: 14,
+    camasUtiUco: 0,
+    camasUtiNeoPed: 0,
+    camasUci: 2,
+    totalCamas: 16,
+  },
+
+  // —— Quitilipi ——
+  {
+    id: 'clinica-integral-quitilipi',
+    nombre: 'Clínica Integral Servicios de Salud',
+    localidad: 'Quitilipi',
+    camasGenerales: 26,
+    camasUtiUco: 8,
+    camasUtiNeoPed: 0,
+    camasUci: 0,
+    totalCamas: 34,
+  },
+
+  // —— Presidencia Roque Sáenz Peña ——
+  {
+    id: 'clinica-saenz-pena',
+    nombre: 'Clínica Sáenz Peña',
+    localidad: 'Presidencia Roque Sáenz Peña',
+    camasGenerales: 26,
+    camasUtiUco: 11,
+    camasUtiNeoPed: 0,
+    camasUci: 0,
+    totalCamas: 37,
+  },
+  {
+    id: 'sanatorio-mayo',
+    nombre: 'Sanatorio Mayo Salud Mental',
+    localidad: 'Presidencia Roque Sáenz Peña',
+    camasGenerales: 53,
+    camasUtiUco: 0,
+    camasUtiNeoPed: 0,
+    camasUci: 0,
+    totalCamas: 53,
+  },
+  {
+    id: 'clinica-centro-medico',
+    nombre: 'Clínica Centro Médico',
+    localidad: 'Presidencia Roque Sáenz Peña',
+    camasGenerales: 22,
+    camasUtiUco: 4,
+    camasUtiNeoPed: 0,
+    camasUci: 3,
+    totalCamas: 29,
+  },
+  {
+    id: 'clinica-avenida',
+    nombre: 'Clínica Avenida',
+    localidad: 'Presidencia Roque Sáenz Peña',
+    camasGenerales: 124,
+    camasUtiUco: 21,
+    camasUtiNeoPed: 15,
+    camasUci: 0,
+    totalCamas: 160,
+  },
+  {
+    id: 'instituto-santa-maria',
+    nombre: 'Instituto Privado Santa María',
+    localidad: 'Presidencia Roque Sáenz Peña',
+    camasGenerales: 36,
+    camasUtiUco: 12,
+    camasUtiNeoPed: 13,
+    camasUci: 10,
+    totalCamas: 71,
+  },
+
+  // —— Juan José Castelli ——
+  {
+    id: 'clinica-castelli',
+    nombre: 'Clínica Castelli',
+    localidad: 'Juan José Castelli',
+    camasGenerales: 35,
+    camasUtiUco: 10,
+    camasUtiNeoPed: 6,
+    camasUci: 0,
+    totalCamas: 51,
+  },
+  {
+    id: 'sanatorio-lazara-valdez',
+    nombre: 'Sanatorio Lázara Valdez',
+    localidad: 'Juan José Castelli',
+    camasGenerales: 18,
+    camasUtiUco: 0,
+    camasUtiNeoPed: 0,
+    camasUci: 0,
+    totalCamas: 18,
+  },
+
+  // —— Villa Ángela ——
+  {
+    id: 'sanatorio-sur',
+    nombre: 'Sanatorio Sur',
+    localidad: 'Villa Ángela',
+    camasGenerales: 28,
+    camasUtiUco: 14,
+    camasUtiNeoPed: 0,
+    camasUci: 0,
+    totalCamas: 42,
+  },
+  {
+    id: 'sanatorio-central-salud',
+    nombre: 'Sanatorio Central de Salud',
+    localidad: 'Villa Ángela',
+    camasGenerales: 28,
+    camasUtiUco: 8,
+    camasUtiNeoPed: 0,
+    camasUci: 0,
+    totalCamas: 36,
+  },
+  {
+    id: 'sanatorio-parque',
+    nombre: 'Sanatorio Parque',
+    localidad: 'Villa Ángela',
+    camasGenerales: 18,
+    camasUtiUco: 11,
+    camasUtiNeoPed: 0,
+    camasUci: 0,
+    totalCamas: 29,
+  },
+
+  // —— Corzuela ——
+  {
+    id: 'clinica-corzuela',
+    nombre: 'Clínica Corzuela',
+    localidad: 'Corzuela',
+    camasGenerales: 14,
+    camasUtiUco: 0,
+    camasUtiNeoPed: 0,
+    camasUci: 0,
+    totalCamas: 14,
+  },
+
+  // —— Las Breñas ——
+  {
+    id: 'clinica-las-brenas',
+    nombre: 'Clínica Las Breñas',
+    localidad: 'Las Breñas',
+    camasGenerales: 13,
+    camasUtiUco: 0,
+    camasUtiNeoPed: 0,
+    camasUci: 0,
+    totalCamas: 13,
+  },
+  {
+    id: 'clinica-regional-brenas',
+    nombre: 'Clínica Regional',
+    localidad: 'Las Breñas',
+    camasGenerales: 10,
+    camasUtiUco: 0,
+    camasUtiNeoPed: 0,
+    camasUci: 0,
+    totalCamas: 10,
+  },
+
+  // —— Hermoso Campo ——
+  {
+    id: 'clinica-integral-hermoso-campo',
+    nombre: 'Clínica Integral',
+    localidad: 'Hermoso Campo',
+    camasGenerales: 11,
+    camasUtiUco: 0,
+    camasUtiNeoPed: 0,
+    camasUci: 0,
+    totalCamas: 11,
   },
 ]
 
